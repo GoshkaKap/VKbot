@@ -18,10 +18,10 @@ for event in longpool.listen():
 
             first_check = {
                             'api_version' : 'v1',
-                            'main_token' : '2Ws9hR9R1kaZ',
+                            'main_token' : 'bla',
                             'query_details' : 
                                 {
-                                'source_token' : '687_66edc5e066eef9b1df044d07a635b469', 
+                                'source_token' : 'bla', 
                                 'text' : msg,
                                 'dictionaries' :
                                     {
@@ -41,7 +41,7 @@ for event in longpool.listen():
                 if res['result']['final']['check']['check_result'] != [] :
                     send_some_msg(id, 'Ваше обращение не принято к рассмотрению, так как оно содержит ненормативную лексику.')
                 else :
-                    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "2919728073d3aa51ed3e04d4e7eb5153eab05b6d")
+                    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "blabla")
                     res = client.classification(msg, labels=['собака', 'бродячие', 
                                                              'газ', 'вода', 'труба', 'пар', 'лифт', 'мусор',
                                                              'расселение'], multi_class=True)
