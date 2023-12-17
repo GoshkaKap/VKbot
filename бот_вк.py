@@ -4,12 +4,14 @@ import requests
 import nlpcloud
 import time
 
-bot = vk_api.VkApi(token='token')
+bot = vk_api.VkApi(token='vk1.a.I_CYefA8K0q6dx4Lpp0fgdMJuw3mzjS3w06M-JNZG3drTbzoQbENJdrVeCjMKIEqnBJIJHuI8cqAFO6-UpdsYdrzN-p11dF74AU52ZxgwlKuyS-Le-rma1a-JTOyBxbUbZftunVmx5dYS9I67bR23pr06iSuqOGJKdiSqYPu_jvCvorQvI5o9Xd0vzZd8QlGs1r_yllMVY0tS6JhQ3Rkjg')
 session_api = bot.get_api()
-longpool = VkLongPoll(bot)
+longpool = VkLongPoll(bot)       
 
-def what(msg) :
-    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "token")
+#Мы подключились к нашему боту
+
+def what(msg) : # функция для получения тематики текста
+    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "2919728073d3aa51ed3e04d4e7eb5153eab05b6d")
     res = client.classification(msg, labels=['собака', 'бродячие', 
                                              'газ', 'вода', 'труба', 'пар', 'лифт работает', 'мусор',
                                              'расселение', 'расселят'], multi_class=True)
@@ -19,7 +21,7 @@ def what(msg) :
                                               'ветхое', 'жильё'], multi_class=True)
     return([res,res2])
 
-def send_some_msg(id, some_text):
+def send_some_msg(id, some_text): #функция для упрощения отправки сообщений
     text = ''
     for i in some_text :
         text += i
@@ -29,15 +31,16 @@ def send_some_msg(id, some_text):
 for event in longpool.listen():
     if event.type == VkEventType.MESSAGE_NEW:
         if event.to_me:
+            # Ниже представлено основное решение
             msg = event.text.lower()
-            id  = event.user_id
+            id  = event.user_id          #записываем данные о сообщении и отправителе
 
-            first_check =  {
+            first_check =  { #создаём словарь для отправки его в сервис
                             'api_version'   : 'v1',
-                            'main_token'    : 'token',
+                            'main_token'    : '2Ws9hR9R1kaZ',
                             'query_details' : 
                                 {
-                                'source_token' : 'token', 
+                                'source_token' : '687_66edc5e066eef9b1df044d07a635b469', 
                                 'text'         : msg,
                                 'dictionaries' :
                                     {
@@ -52,25 +55,25 @@ for event in longpool.listen():
                                 }
                           }
             
-            res = requests.post('https://lf.statusnick.com/api/text/check', json = first_check).json()
+            res = requests.post('https://lf.statusnick.com/api/text/check', json = first_check).json() #проверяем текст на наличие ненормативной лексики
             lose = False
             try :
-                if res['result']['final']['check']['check_result'] != [] :
+                if res['result']['final']['check']['check_result'] != [] : #если запрещённые слова имеются, то данный if выполнится
                     lose = True
                     send_some_msg(id, ['Ваше обращение не принято к рассмотрению, так как оно содержит ненормативную лексику.'])
-            except KeyError: 
+            except KeyError: #KeyError будет вызван, если отправлен стикер
                 lose = True
                 send_some_msg(id, ['Вы вызвали сбой в системе! \n',
                                    'Бот принимает только текст'])
-            if lose == False :
+            if lose == False : #если у сообщения можно определить тематику, данный if выполнится
                 often = False
                 try:
                     res = what(msg)
                     res2 = res[1]
-                    res = res[0]
+                    res = res[0]            #Получили вероятность каждой темы
                 except requests.exceptions.HTTPError :
                     try:
-                        time.sleep(35)
+                        time.sleep(35)                  #requests.exceptions.HTTPError будет вызван, если к серверу обращаются слишком часто
                         res = what(msg)
                         res2 = res[1]
                         res = res[0]
@@ -78,19 +81,19 @@ for event in longpool.listen():
                         send_some_msg(id, ['Вы слишком часто отправляете сообщения!'])
                         often = True
 
-                if often == False :
+                if often == False : #когда мы имеем вероятности тем, if выполнится
                     animals = sum(res['scores'][0:2] + res2['scores'][0:3])   / len(res['scores'][0:2] + res2['scores'][0:3])                            
                     ways    = sum(res2['scores'][3:5])                        / len(res2['scores'][3:5])                                                   
                     streets = sum(res['scores'][2:8] + res2['scores'][5:8])   / (len(res['scores'][2:8] + res2['scores'][5:8]) - 1)         
                     home    = sum(res['scores'][8:10] + res2['scores'][8:10]) / len(res['scores'][8:10] + res2['scores'][8:10])
-                    
-                    scores = [animals, ways, streets, home]
-                    if  max(scores) - min(scores) < 0.065:
+
+                    scores = [animals, ways, streets, home]      #находим общую вероятность каждой темы и записываем в список
+                    if  max(scores) - min(scores) < 0.065:     #если боту плохо удалось определить тему, if выполнится
                         hello = ['здравствуйте', 'привет', 'добр' ]
                         bye   = ['до свид', 'пока']
 
                         problem = True
-                        for i in range(0, len(hello)-1) :
+                        for i in range(0, len(hello)-1) : #проверяем, является ли сообщение приветствием или прощанием
                             if -1 < msg.find(hello[i]) < len(hello) :
                                     problem = False
                                     send_some_msg(id, ['Здравствуйте! \n',
@@ -102,13 +105,13 @@ for event in longpool.listen():
                                     send_some_msg(id, ['До свидания! \n',
                                                        'Надеюсь, мы смогли решить Ваш вопрос. Буду рад помочь Вам снова'])
                                     break
-                        if problem :
+                        if problem :   #если сообщение не является приветствием или прощанием, произойдёт следующее:
                             send_some_msg(id, ['Мы Вас не поняли \n',
                                                'Попробуйте сформулировать Вашу проблему иначе'])
-                    else :                       
-                        index_max = scores.index(max(scores))
+                    else :                        
+                        index_max = scores.index(max(scores)) #определяем тему 
 
-                        if   index_max == 0 :
+                        if   index_max == 0 :                           #организуем ответ по каждой теме
                             send_some_msg(id, ['Благодарим за обращение! \n',
                                                'В Вашем городе уже работают службы по отлову бродячих животных \n',
                                                'publication.pravo.gov.ru/document/1401202308240001?index=1'])
