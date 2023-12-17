@@ -4,12 +4,12 @@ import requests
 import nlpcloud
 import time
 
-bot = vk_api.VkApi(token='vk1.a.I_CYefA8K0q6dx4Lpp0fgdMJuw3mzjS3w06M-JNZG3drTbzoQbENJdrVeCjMKIEqnBJIJHuI8cqAFO6-UpdsYdrzN-p11dF74AU52ZxgwlKuyS-Le-rma1a-JTOyBxbUbZftunVmx5dYS9I67bR23pr06iSuqOGJKdiSqYPu_jvCvorQvI5o9Xd0vzZd8QlGs1r_yllMVY0tS6JhQ3Rkjg')
+bot = vk_api.VkApi(token='token')
 session_api = bot.get_api()
 longpool = VkLongPoll(bot)
 
 def what(msg) :
-    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "2919728073d3aa51ed3e04d4e7eb5153eab05b6d")
+    client = nlpcloud.Client("bart-large-mnli-yahoo-answers", "token")
     res = client.classification(msg, labels=['собака', 'бродячие', 
                                              'газ', 'вода', 'труба', 'пар', 'лифт работает', 'мусор',
                                              'расселение', 'расселят'], multi_class=True)
@@ -34,10 +34,10 @@ for event in longpool.listen():
 
             first_check =  {
                             'api_version'   : 'v1',
-                            'main_token'    : '2Ws9hR9R1kaZ',
+                            'main_token'    : 'token',
                             'query_details' : 
                                 {
-                                'source_token' : '687_66edc5e066eef9b1df044d07a635b469', 
+                                'source_token' : 'token', 
                                 'text'         : msg,
                                 'dictionaries' :
                                     {
